@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-# encoding: utf-8
+
 require "prawn"
 class ArticlesController < ApplicationController
   skip_forgery_protection
@@ -12,12 +12,12 @@ class ArticlesController < ApplicationController
   end
 
   def show; 
-    respond_to do |format|
-      format.html
-      format.pdf do
-        render pdf: generate_pdf(@article) 
-      end
-    end
+    #respond_to do |format|
+    #  format.html
+    #  format.pdf do
+    #    render pdf: generate_pdf(@article) 
+    #  end
+    #end
   end
 
   def new
@@ -63,12 +63,12 @@ class ArticlesController < ApplicationController
     redirect_to root_path
   end
 
-  def download_pdf
-    article = Article.find(params[:id])
-    send_data generate_pdf(article),
-              filename: "#{article.name}.pdf",
-              type: "application/pdf"
-  end
+  #def download_pdf
+  #  article = Article.find(params[:id])
+  #  send_data generate_pdf(article),
+  #            filename: "#{article.name}.pdf",
+  #            type: "application/pdf"
+  #end
 
   private
 
@@ -76,12 +76,12 @@ class ArticlesController < ApplicationController
     params.require(:article).permit(:title, :body)
   end
 
-  def generate_pdf(article)
-    Prawn::Document.new do
-      text "Title: #{article.title}"
-      text "Body: #{article.body}"
-    end.render
-  end
+  #def generate_pdf(article)
+  #  Prawn::Document.new do
+  #    text "Title: #{article.title}"
+  #    text "Body: #{article.body}"
+  #  end.render
+  #end
 
 end
 
