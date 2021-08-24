@@ -1,0 +1,7 @@
+require: rubocop-rails
+AllCops: 
+  Exclude:
+    - 'db/migrate'
+    - 'bin/bundle'
+Documentation:
+  Enabled: false
