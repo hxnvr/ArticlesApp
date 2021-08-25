@@ -7,29 +7,41 @@ class ArticlesController < ApplicationController
   before_action :set_params, only: %i[show edit update destroy]
   around_action :around
   # rescue_from
+
   def index
+    cookies[:some_cookie] = {value: "some value"}
+    cookies.permanent[:perm_cookie] = {
+      value: "some perm cookie"
+    }
+    cookies.signed[:password] = {
+      value: "secured password", httponly: true
+    }
     @articles = Article.all
   end
 
   def show; 
-    #respond_to do |format|
-    #  format.html
-    #  format.pdf do
-    #    render pdf: generate_pdf(@article) 
-    #  end
-    #end
+    respond_to do |format|
+      format.html
+      format.json { render :show, status: :ok, location: @article }
+      format.pdf do
+        pdf = Prawn::Document.new 
+        pdf.text "Title: #{@article.title}"
+        pdf.text "Body: #{@article.body}"
+        send_data pdf.render,
+          filename: "#{@article.title}.pdf",
+          type: "application/pdf"
+      end
+    end
   end
 
   def new
     @article = Article.new
   end
 
-  # def name_of_article
 
-  # end
   def around
     yield
-    puts response.code
+    puts "HTTP CODE: #{response.code}"
   end
 
   def set_params
@@ -38,12 +50,15 @@ class ArticlesController < ApplicationController
 
   def create
     @article = Article.new(article_params)
-
-    if @article.save
-      redirect_to @article
-    else
-      render :new
-      # flash[:error] = "Article cannot be saved"
+    respond_to do |format|
+      if @article.save
+        format.html { redirect_to @article, notice: 'Article was successfully created.' }
+        format.json { render :show, status: :ok, location: @article }
+      else
+        format.html { render :new, status: :unprocessable_entity }
+        format.json { render json: @article.errors, status: :unprocessable_entity }
+         # flash[:error] = "Article cannot be saved"
+      end
     end
   end
 
@@ -51,24 +66,22 @@ class ArticlesController < ApplicationController
 
   def update
     if @article.update(article_params)
-      redirect_to @article
+      format.html { redirect_to @article, notice: 'Article was successfully updated.' }
+      format.json { render :show, status: :created, location: @article }
     else
-      render :edit
+      format.html { render :edit, status: :unprocessable_entity }
+      format.json { render json: @article.errors, status: :unprocessable_entity }
     end
   end
 
   def destroy
     @article.destroy
-
-    redirect_to root_path
+    respond_to do |format|
+      format.html { redirect_to article_url, notice: 'Article was successfully destroyed.' }
+      format.json { head :no_content }
+    end
   end
 
-  #def download_pdf
-  #  article = Article.find(params[:id])
-  #  send_data generate_pdf(article),
-  #            filename: "#{article.name}.pdf",
-  #            type: "application/pdf"
-  #end
 
   private
 
@@ -76,15 +89,8 @@ class ArticlesController < ApplicationController
     params.require(:article).permit(:title, :body)
   end
 
-  #def generate_pdf(article)
-  #  Prawn::Document.new do
-  #    text "Title: #{article.title}"
-  #    text "Body: #{article.body}"
-  #  end.render
-  #end
-
 end
 
-# pdf/ wicked_pdf/ prawn
+
 # xml
 # notice for unsuccessful
