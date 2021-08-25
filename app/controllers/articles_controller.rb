@@ -23,6 +23,7 @@ class ArticlesController < ApplicationController
     respond_to do |format|
       format.html
       format.json { render :show, status: :ok, location: @article }
+      format.xml {render :show, status: :ok, location: @article}
       format.pdf do
         pdf = Prawn::Document.new 
         pdf.text "Title: #{@article.title}"
@@ -55,7 +56,7 @@ class ArticlesController < ApplicationController
         format.html { redirect_to @article, notice: 'Article was successfully created.' }
         format.json { render :show, status: :ok, location: @article }
       else
-        format.html { render :new, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_entity}
         format.json { render json: @article.errors, status: :unprocessable_entity }
          # flash[:error] = "Article cannot be saved"
       end

@@ -3,7 +3,7 @@
 module Admin
   class UsersController < ApplicationController
     before_action :set_admin_user, only: %i[show edit update destroy]
-    prepend_view_path "app/views/admin_user"
+    prepend_view_path 'app/views/admin_user'
     # GET /admin/users or /admin/users.json
     def index
       @admin_users = Admin::User.all
